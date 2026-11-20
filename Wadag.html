@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مقهى ودق | Wadq Cafe</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Amiri',serif}
+  :root{--purple:#6A1B9A;--beige:#F5EBDD;--beige2:#EADFCB;--dark:#2A1A33}
+  body{background:var(--beige);color:var(--dark);overflow-x:hidden}
+  /* شريط التحميل العلوي */
+  #progress{position:fixed;top:0;right:0;height:3px;width:0;background:linear-gradient(90deg,#C9A86A,#6A1B9A);z-index:200;transition:width .4s ease}
+  header{position:fixed;top:3px;right:0;left:0;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);display:flex;justify-content:space-between;align-items:center;padding:12px 5%;z-index:100;box-shadow:0 2px 20px rgba(106,27,154,.08)}
+  .logo{font-size:32px;font-weight:700;color:var(--purple);cursor:pointer}
+  .logo span{color:#C9A86A;font-size:18px}
+  /* تنقل احترافي */
+  nav{display:flex;gap:4px;position:relative}
+  nav button{border:none;background:transparent;padding:11px 18px;font-size:19px;cursor:pointer;color:#555;position:relative;transition:.3s;border-radius:10px}
+  nav button:hover{color:var(--purple);background:rgba(106,27,154,.06)}
+  nav button.active{color:var(--purple);font-weight:700}
+  nav button.active::after{content:'';position:absolute;bottom:2px;right:18px;left:18px;height:3px;background:var(--purple);border-radius:10px;animation:slideIn .4s ease}
+  @keyframes slideIn{from{transform:scaleX(0);opacity:0}to{transform:scaleX(1);opacity:1}}
+  .menu-btn{display:none;font-size:26px;background:none;border:none;cursor:pointer}
+  main{padding-top:88px;min-height:100vh}
+  /* انتقال احترافي بين الصفحات */
+  .page{display:none;opacity:0;transform:translateY(15px);transition:opacity .45s ease, transform .45s ease}
+  .page.active{display:block;opacity:1;transform:translateY(0)}
+  .page.leaving{opacity:0;transform:translateY(-10px)}
+  .hero{background:linear-gradient(135deg,var(--purple) 0%,#8E24AA 50%,#C9A86A 130%);color:#fff;padding:70px 5% 60px;text-align:center;border-radius:0 0 40px 40px}
+  .hero h1{font-size:58px;line-height:1.2}
+  .hero p{font-size:22px;opacity:.9;margin:15px 0 25px}
+  .btn{background:#fff;color:var(--purple);border:none;padding:14px 32px;border-radius:30px;font-size:21px;font-weight:700;cursor:pointer;transition:.3s;box-shadow:0 10px 25px rgba(0,0,0,.15)}
+  .btn:hover{transform:translateY(-3px) scale(1.03)}
+  .btn-purple{background:var(--purple);color:#fff}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;padding:30px 5%}
+  .card{background:#fff;border-radius:22px;padding:24px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.06);transition:.4s}
+  .card:hover{transform:translateY(-8px)}
+  .card h3{color:var(--purple);font-size:24px;margin-bottom:8px}
+  .info-bar{background:#fff;margin:0 5% 30px;padding:20px;border-radius:20px;display:flex;justify-content:space-around;flex-wrap:wrap;gap:15px;text-align:center;border:1px solid var(--beige2)}
+  .menu-wrap{display:flex;gap:25px;padding:20px 5% 40px;align-items:flex-start}
+  .menu-side{width:280px;background:#fff;border-radius:22px;padding:20px;position:sticky;top:100px;box-shadow:0 10px 30px rgba(0,0,0,.06)}
+  .menu-side h3{color:var(--purple);margin-bottom:12px}
+  .menu-side button{display:block;width:100%;text-align:right;padding:12px 14px;margin-bottom:8px;border:1px solid #eee;background:var(--beige);border-radius:12px;font-size:19px;cursor:pointer;transition:.3s}
+  .menu-side button.active{background:var(--purple);color:#fff}
+  .menu-content{flex:1}
+  .menu-cat{display:none}
+  .menu-cat.active{display:block;animation:fadeUp .4s ease both}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  .item{background:#fff;display:flex;justify-content:space-between;align-items:center;gap:15px;padding:16px 20px;margin-bottom:12px;border-radius:16px;box-shadow:0 5px 15px rgba(0,0,0,.04);transition:.3s}
+  .item:hover{transform:translateX(-5px);border-right:4px solid var(--purple)}
+  .item b{font-size:20px}
+  .item small{color:#888;display:block}
+  .price{background:var(--beige);color:var(--purple);padding:6px 14px;border-radius:20px;font-weight:700;white-space:nowrap}
+  .order-box{max-width:650px;margin:30px auto;background:#fff;padding:30px;border-radius:25px;box-shadow:0 15px 40px rgba(0,0,0,.08)}
+  .order-box input,.order-box select,.order-box textarea{width:100%;padding:13px;margin-bottom:12px;border:1px solid #EADFCB;border-radius:12px;font-size:18px;font-family:'Amiri',serif}
+  .about-bg{width:100%;min-height:calc(100vh - 88px);background-image:url('bage.jpg.jpg');background-size:cover;background-position:center;display:flex;align-items:flex-end}
+  .about-overlay{width:100%;background:linear-gradient(to top, rgba(0,0,0,.85) 0%, rgba(0,0,0,.5) 55%, transparent 100%);color:#fff;padding:80px 5% 40px}
+  .about-overlay h2{font-size:36px;color:#fff;margin-bottom:8px}
+  .about-overlay p{font-size:22px;line-height:1.9;margin-top:10px;color:#fff}
+  .contact{max-width:750px;margin:30px auto;background:#fff;padding:30px;border-radius:25px;text-align:center}
+  .qr-card{background:#F5EBDD;padding:20px;border-radius:22px;text-align:center;width:260px}
+  .qr-card img{width:100%;aspect-ratio:1/1;object-fit:contain;border-radius:16px;background:#fff;display:block}
+  footer{background:var(--purple);color:#fff;text-align:center;padding:25px;margin-top:20px}
+  @media(max-width:768px){
+    .menu-btn{display:block}
+    nav{position:fixed;top:70px;right:0;left:0;background:#fff;flex-direction:column;padding:10px;box-shadow:0 10px 30px rgba(0,0,0,.1);transform:translateY(-120%);transition:.4s;z-index:99}
+    nav.open{transform:translateY(0)}
+    nav button{width:100%;text-align:center}
+    nav button.active::after{display:none}
+    .menu-wrap{flex-direction:column}.menu-side{width:100%;position:static}.hero h1{font-size:40px}.about-bg{min-height:500px}
+  }
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header>
+  <div class="logo" onclick="go('home')">ودق <span>Wadq</span></div>
+  <button class="menu-btn" onclick="document.getElementById('mainNav').classList.toggle('open')">☰</button>
+  <nav id="mainNav">
+    <button data-page="home" class="active" onclick="go('home',this)">الرئيسية</button>
+    <button data-page="menu" onclick="go('menu',this)">القائمة</button>
+    <button data-page="order" onclick="go('order',this)">اطلب الآن</button>
+    <button data-page="about" onclick="go('about',this)">من نحن</button>
+    <button data-page="contact" onclick="go('contact',this)">تواصل معنا</button>
+  </nav>
+</header>
+
+<main>
+<section id="home" class="page active">
+  <div class="hero">
+    <p>أهلاً بك في ودق</p>
+    <h1>قهوة بمزاج<br>ومكان يشرح الصدر</h1>
+    <p>الحضرور - مقابل النهدي | من الساعة 4 عصراً حتى 2:30 صباحاً</p>
+    <button class="btn" onclick="go('menu')">عرض القائمة ☕</button>
+    <button class="btn btn-purple" style="background:#C9A86A;color:#fff;margin-right:10px" onclick="go('order')">اطلب الآن</button>
+  </div>
+  <div class="cards">
+    <div class="card"><h3>☕ قهوة مختصة</h3><p>إثيوبيا، كولومبيا، قهوة يمنية فاخرة V60</p></div>
+    <div class="card"><h3>🧋 مشروبات باردة</h3><p>سبانيش لاتيه، موهيتو، ماتشا</p></div>
+    <div class="card"><h3>🍰 حلويات</h3><p>تشيز كيك، تراميسو، كيكة العسل</p></div>
+  </div>
+  <div class="info-bar">
+    <div><b>📍 الموقع</b><br>الحضرور - مقابل النهدي</div>
+    <div><b>🕓 أوقات العمل</b><br>4 عصراً - 2:30 صباحاً</div>
+    <div><b>💰 العملة</b><br>ريال سعودي</div>
+  </div>
+</section>
+
+<section id="menu" class="page">
+  <h2 style="text-align:center;color:var(--purple);font-size:36px;padding:20px 0 5px">قائمتنا</h2>
+  <p style="text-align:center;color:#888">الأسعار بالريال السعودي</p>
+  <div class="menu-wrap">
+    <aside class="menu-side">
+      <h3>الأقسام</h3>
+      <button class="active" onclick="showCat('hot',this)">☕ قهوة ساخنة</button>
+      <button onclick="showCat('cold',this)">🧋 مشروبات باردة</button>
+      <button onclick="showCat('sweet',this)">🍰 حلويات</button>
+      <div style="margin-top:20px;background:var(--beige);padding:14px;border-radius:14px;text-align:center">
+        <b>هل ترغب في الطلب؟</b><br><button class="btn btn-purple" style="margin-top:10px;width:100%" onclick="go('order')">اطلب الآن</button>
+      </div>
+    </aside>
+    <div class="menu-content">
+      <div id="hot" class="menu-cat active">
+        <div class="item"><div><b>إثيوبيا V60</b><small>قهوة مختصة</small></div><span class="price">15 ر.س</span></div>
+        <div class="item"><div><b>كولومبيا V60</b></div><span class="price">15 ر.س</span></div>
+        <div class="item"><div><b>يمني فاخر V60</b></div><span class="price">16 ر.س</span></div>
+        <div class="item"><div><b>شاي إنجليزي</b></div><span class="price">5 ر.س</span></div>
+        <div class="item"><div><b>أمريكانو</b></div><span class="price">10 ر.س</span></div>
+        <div class="item"><div><b>إسبريسو دبل شوت</b></div><span class="price">7 ر.س</span></div>
+        <div class="item"><div><b>كراميل ماكياتو</b></div><span class="price">10 ر.س</span></div>
+        <div class="item"><div><b>كابتشينو</b></div><span class="price">12 ر.س</span></div>
+        <div class="item"><div><b>قهوة سعودية</b></div><span class="price">5 ر.س</span></div>
+        <div class="item"><div><b>هوت شوكلت</b></div><span class="price">10 ر.س</span></div>
+        <div class="item"><div><b>قهوة تركية</b></div><span class="price">6 ر.س</span></div>
+        <div class="item"><div><b>قهوة إيطالية</b></div><span class="price">12 ر.س</span></div>
+        <div class="item"><div><b>موكا توفي</b></div><span class="price">10 ر.س</span></div>
+        <div class="item"><div><b>موكا فراولة</b></div><span class="price">10 ر.س</span></div>
+        <div class="item"><div><b>ماكياتو</b></div><span class="price">10 ر.س</span></div>
+        <div class="item"><div><b>قهوة فرنسية بالبندق</b></div><span class="price">12 ر.س</span></div>
+        <div class="item"><div><b>موكا بندق</b></div><span class="price">10 ر.س</span></div>
+        <div class="item"><div><b>بيستاشو لاتيه</b></div><span class="price">13 ر.س</span></div>
+        <div class="item"><div><b>ماتشا</b></div><span class="price">14 ر.س</span></div>
+        <div class="item"><div><b>لاتيه</b></div><span class="price">12 ر.س</span></div>
+        <div class="item"><div><b>فلات وايت</b></div><span class="price">12 ر.س</span></div>
+        <div class="item"><div><b>كورتادو</b></div><span class="price">12 ر.س</span></div>
+        <div class="item"><div><b>موكا شوكولاتة</b></div><span class="price">10 ر.س</span></div>
+      </div>
+      <div id="cold" class="menu-cat">
+        <div class="item"><div><b>قهوة اليوم</b></div><span class="price">5 - 9 ر.س</span></div>
+        <div class="item"><div><b>يمني فاخر V60</b></div><span class="price">18 ر.س</span></div>
+        <div class="item"><div><b>إسبريسو أفرودو</b></div><span class="price">8 ر.س</span></div>
+        <div class="item"><div><b>كركديه</b></div><span class="price">10 ر.س</span></div>
+        <div class="item"><div><b>أمريكانو بارد</b></div><span class="price">10 ر.س</span></div>
+        <div class="item"><div><b>سبانيش لاتيه</b></div><span class="price">15 ر.س</span></div>
+        <div class="item"><div><b>لاتيه بارد</b></div><span class="price">13 ر.س</span></div>
+        <div class="item"><div><b>بيستاشو لاتيه</b></div><span class="price">16 ر.س</span></div>
+        <div class="item"><div><b>سبانيش ماتشا</b></div><span class="price">16 ر.س</span></div>
+        <div class="item"><div><b>كراميل بارد</b></div><span class="price">15 ر.س</span></div>
+        <div class="item"><div><b>موهيتو أزرق</b></div><span class="price">10 ر.س</span></div>
+        <div class="item"><div><b>كودرد بنكهة</b></div><span class="price">10 ر.س</span></div>
+        <div class="item"><div><b>موهيتو مكس</b></div><span class="price">10 ر.س</span></div>
+        <div class="item"><div><b>موهيتو أحمر</b></div><span class="price">10 ر.س</span></div>
+        <div class="item"><div><b>موكا شوكولاتة</b></div><span class="price">12 ر.س</span></div>
+        <div class="item"><div><b>موكا توفي</b></div><span class="price">12 ر.س</span></div>
+        <div class="item"><div><b>موكا فراولة</b></div><span class="price">12 ر.س</span></div>
+        <div class="item"><div><b>موكا بندق</b></div><span class="price">12 ر.س</span></div>
+      </div>
+      <div id="sweet" class="menu-cat">
+        <div class="item"><div><b>كيك الشوكولاتة</b></div><span class="price">15 ر.س</span></div>
+        <div class="item"><div><b>كوكيز شوكولاتة بالصوص</b></div><span class="price">9 ر.س</span></div>
+        <div class="item"><div><b>كيكة العسل</b></div><span class="price">16 ر.س</span></div>
+        <div class="item"><div><b>بان كيك</b></div><span class="price">10 - 15 ر.س</span></div>
+        <div class="item"><div><b>كيكة الزعفران</b></div><span class="price">13 ر.س</span></div>
+        <div class="item"><div><b>تشيز كيك بيكان</b></div><span class="price">18 ر.س</span></div>
+        <div class="item"><div><b>وافل</b></div><span class="price">7 ر.س</span></div>
+        <div class="item"><div><b>بودينغ الشوكولاتة</b></div><span class="price">14 ر.س</span></div>
+        <div class="item"><div><b>كوكيز شوكولاتة</b></div><span class="price">8 ر.س</span></div>
+        <div class="item"><div><b>سبيستيان</b></div><span class="price">17 ر.س</span></div>
+        <div class="item"><div><b>تراميسو</b></div><span class="price">15 ر.س</span></div>
+        <div class="item"><div><b>إضافة صوص</b></div><span class="price">2 ر.س</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="order" class="page">
+  <h2 style="text-align:center;color:var(--purple);font-size:36px;padding:20px">اطلب الآن</h2>
+  <div class="order-box">
+    <input placeholder="الاسم">
+    <input placeholder="رقم الجوال">
+    <select><option>اختر طلبك</option><option>إثيوبيا V60 - 15 ر.س</option><option>كابتشينو - 12 ر.س</option><option>سبانيش لاتيه - 15 ر.س</option><option>موهيتو أزرق - 10 ر.س</option><option>تشيز كيك بيكان - 18 ر.س</option></select>
+    <textarea placeholder="ملاحظات الطلب"></textarea>
+    <button class="btn btn-purple" style="width:100%" onclick="window.open('https://wa.me/966500757180','_blank')">إرسال الطلب عبر واتساب</button>
+  </div>
+</section>
+
+<section id="about" class="page">
+  <div class="about-bg">
+    <div class="about-overlay">
+      <h2>من نحن - ودق</h2>
+      <p>ودق ليس مجرد مقهى، بل هو مكان للهدوء واللقاءات الجميلة. نقدم لك قهوة مختصة بعناية فائقة، من القهوة الإثيوبية والكولومبية إلى القهوة اليمنية الفاخرة، مع حلويات أُعدّت بحب.</p>
+      <p>يقع مقهانا في الحضرور مقابل النهدي، ونستقبلكم يومياً من الساعة 4 عصراً حتى 2:30 صباحاً.</p>
+      <p><b>ودق - حيث للقهوة مذاق آخر.</b></p>
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="page">
+  <div class="contact">
+    <h2 style="color:var(--purple);font-size:34px">تواصل معنا</h2>
+    <p style="font-size:21px;margin-top:10px">الحضرور - مقابل النهدي<br>من الساعة 4 عصراً حتى 2:30 صباحاً</p>
+    <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin:25px 0">
+      <div class="qr-card">
+        <img src="whatsapp-qr.jpg" alt="باركود واتساب">
+        <h3 style="margin:12px 0 4px">واتساب</h3>
+        <p style="color:#666">0500757180</p>
+        <a href="https://wa.me/966500757180" target="_blank" style="display:block;background:#25D366;color:#fff;text-decoration:none;padding:13px;border-radius:30px;font-weight:700;margin-top:12px">تواصل عبر واتساب</a>
+      </div>
+      <div class="qr-card">
+        <img src="snap-qr.jpg" alt="باركود سناب">
+        <h3 style="margin:12px 0 4px">سناب شات</h3>
+        <p style="color:#666">Wadq Coffee</p>
+        <a href="https://snapchat.com/add/wadqcoffee" target="_blank" style="display:block;background:#FFFC00;color:#000;text-decoration:none;padding:13px;border-radius:30px;font-weight:700;margin-top:12px">تابعنا على سناب شات</a>
+      </div>
+    </div>
+    <p>امسح الباركود أو اضغط على الزر للتواصل مباشرة</p>
+  </div>
+</section>
+</main>
+<footer>© 2026 مقهى ودق - الحضرور مقابل النهدي | 4 عصراً - 2:30 صباحاً</footer>
+
+<script>
+let currentPage = 'home';
+function go(id, btn){
+  if(id === currentPage) {
+    window.scrollTo({top:0,behavior:'smooth'});
+    document.getElementById('mainNav').classList.remove('open');
+    return;
+  }
+  const progress = document.getElementById('progress');
+  progress.style.width = '70%';
+  const old = document.getElementById(currentPage);
+  old.classList.add('leaving');
+  setTimeout(()=>{
+    old.classList.remove('active','leaving');
+    const next = document.getElementById(id);
+    next.classList.add('active');
+    // تحديث أزرار التنقل
+    document.querySelectorAll('#mainNav button').forEach(b=>{
+      b.classList.toggle('active', b.dataset.page === id);
+    });
+    // تحديث الرابط بدون إعادة تحميل
+    history.pushState({page:id}, '', '#'+id);
+    document.title = id === 'home' ? 'مقهى ودق | Wadq Cafe' : 'مقهى ودق - ' + document.querySelector(`[data-page="${id}"]`).textContent;
+    window.scrollTo({top:0,behavior:'smooth'});
+    progress.style.width = '100%';
+    setTimeout(()=> progress.style.width = '0', 300);
+    currentPage = id;
+    document.getElementById('mainNav').classList.remove('open');
+  }, 180);
+}
+function showCat(id,btn){
+  document.querySelectorAll('.menu-cat').forEach(c=>c.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.menu-side button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+// زر الرجوع في المتصفح
+window.addEventListener('popstate', (e)=>{
+  const id = (e.state && e.state.page) || location.hash.replace('#','') || 'home';
+  if(document.getElementById(id)){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelectorAll('#mainNav button').forEach(b=>b.classList.toggle('active', b.dataset.page===id));
+    currentPage = id;
+    window.scrollTo({top:0});
+  }
+});
+// فتح رابط مباشر مثل wadq.com/#menu
+window.addEventListener('DOMContentLoaded', ()=>{
+  const hash = location.hash.replace('#','');
+  if(hash && document.getElementById(hash)){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById(hash).classList.add('active');
+    document.querySelectorAll('#mainNav button').forEach(b=>b.classList.toggle('active', b.dataset.page===hash));
+    currentPage = hash;
+  }
+});
+</script>
+</body>
+</html>
